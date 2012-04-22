@@ -11,7 +11,6 @@ require 'ruby-debug'
 
 config_file = File.join(File.dirname(__FILE__), 'creds.yml')
 config = YAML::load(File.read(config_file)) || {} rescue {}
-puts config.to_hash.inspect
 config[:login_page] ||= "https://www.my.commbank.com.au/netbank/Logon/Logon.aspx"
 config[:login] ||= ask('client no')
 
