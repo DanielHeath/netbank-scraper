@@ -1,9 +1,10 @@
 require 'rubygems'
+require 'csv'
+require 'fileutils'
 require 'yaml'
 require 'capybara'
 require 'capybara/dsl'
 require 'capybara/firebug'
-require 'fileutils'
 require 'selenium/webdriver'
 require "highline/import"
 require 'ruby-debug'
@@ -30,6 +31,7 @@ click_on('View accounts')
 accounts = page.find('select.MandatoryField').all('option')[1..-1].map {|e| e.text }
 
 accounts.each do |account|
+  output_path = 'accountdata/' + account + ".csv"
   select(account, :from => 'ctl00_BodyPlaceHolder_blockAccount_ddlAccount_field')
   click_on 'GO'
   begin
@@ -47,11 +49,10 @@ accounts.each do |account|
   end
 
   data = []
-  page.all("#transactionsTableBody tr").each do |row|
-    data.push row.all('td').map {|e| e.text.gsub("\n", " ").inspect }.join(',')
-  end
-  File.open(account + ".accountdata", 'w') do |f|
-    f.write(data.join("\n"))
+  CSV.open(output_path, "wb") do |csv|
+    page.all("#transactionsTableBody tr").each do |row|
+      csv << row.all('td').map { |e| e.text }
+    end
   end
 
   click_on('View accounts')
